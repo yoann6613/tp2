@@ -1,29 +1,28 @@
-import React from 'react';
-import { AuthProvider } from './AuthContext';
-import { Router } from './Router';
-import PageConnexion from './PageConnexion';
-import UsersPage from './UsersPage';
-import ForbiddenPage from './ForbiddenPage';
-import ProtectedRoute from './ProtectedRoute';
+import { Routes, Route } from "react-router-dom";
+import PageConnexion from "./PageConnexion";
+import UsersPage from "./UsersPage";
+import ForbiddenPage from "./ForbiddenPage";
+import ProtectedRoute from "./ProtectedRoute";
 
-const UsersProtected: React.FC = () => (
-  <ProtectedRoute rolesRequis={['admin', 'user']} Component={UsersPage} />
-);
-
-const routes = {
-  '/': PageConnexion,
-  '/login': PageConnexion,
-  '/users': UsersProtected,
-  '/forbidden': ForbiddenPage,
-  '/404': () => <h2>Page non trouvée</h2>,
-};
-
-const App: React.FC = () => {
+function App() {
   return (
-    <AuthProvider>
-      <Router routes={routes} />
-    </AuthProvider>
+    <Routes>
+      <Route path="/" element={<PageConnexion />} />
+      <Route path="/login" element={<PageConnexion />} />
+
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute rolesRequis={["admin", "user"]}>
+            <UsersPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="/forbidden" element={<ForbiddenPage />} />
+      <Route path="*" element={<h2>Page non trouvée</h2>} />
+    </Routes>
   );
-};
+}
 
 export default App;

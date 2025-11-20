@@ -1,30 +1,23 @@
-import { useContext, useEffect } from 'react';
-import type { FC } from 'react';
-import { AuthContext } from './AuthContext';
+import { useContext } from "react";
+import type { ReactNode } from "react";
+import { Navigate } from "react-router-dom";
+import { AuthContext } from "./AuthContext";
 
-type ProtectedRouteProps = {
-  rolesRequis: Array<'admin' | 'user' | 'guest'>;
-  Component: FC;
+type Props = {
+  rolesRequis: string[];
+  children: ReactNode;
 };
 
-const ProtectedRoute: FC<ProtectedRouteProps> = ({ rolesRequis, Component }) => {
+export default function ProtectedRoute({ rolesRequis, children }: Props) {
   const { isAuthenticated, userRole } = useContext(AuthContext);
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      window.history.pushState({}, '', '/login');
-      window.dispatchEvent(new Event('popstate'));
-    } else if (!rolesRequis.includes(userRole!)) {
-      window.history.pushState({}, '', '/forbidden');
-      window.dispatchEvent(new Event('popstate'));
-    }
-  }, [isAuthenticated, userRole]);
-
-  if (!isAuthenticated || !rolesRequis.includes(userRole!)) {
-    return null;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
 
-  return <Component />;
-};
+  if (!rolesRequis.includes(userRole!)) {
+    return <Navigate to="/forbidden" replace />;
+  }
 
-export default ProtectedRoute;
+  return <>{children}</>;
+}
